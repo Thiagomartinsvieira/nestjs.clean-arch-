@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { EnvConfigModule } from './shared/infraestructure/env-config/env-config.module';
 
 @Module({
-  imports: [EnvConfigModule],
+  imports: [EnvConfigModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })
