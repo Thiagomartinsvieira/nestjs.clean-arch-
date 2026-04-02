@@ -16,6 +16,12 @@ describe('UserEntity integration tests', () => {
         ...UserDataBuilder({}),
         name: '' as unknown as string,
       };
+
+      props = {
+        ...UserDataBuilder({}),
+        name: 10 as unknown as string,
+      };
+
       expect(() => new UserEntity(props)).toThrow(EntityValidationError);
 
       props = {
@@ -24,5 +30,33 @@ describe('UserEntity integration tests', () => {
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidationError);
     });
+
+    it('Should throw an error when creating a user with invalid email', () => {
+      let props: UserProps = {
+        ...UserDataBuilder({}),
+        email: null as unknown as string,
+      };
+
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+
+      props = {
+        ...UserDataBuilder({}),
+        email: '' as unknown as string,
+      };
+
+      props = {
+        ...UserDataBuilder({}),
+        email: 10 as unknown as string,
+      };
+
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+
+      props = {
+        ...UserDataBuilder({}),
+        email: 'a'.repeat(256) as unknown as string,
+      };
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+    });
+    
   });
 });
