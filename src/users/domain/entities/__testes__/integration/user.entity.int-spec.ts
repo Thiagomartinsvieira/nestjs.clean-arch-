@@ -57,6 +57,32 @@ describe('UserEntity integration tests', () => {
       };
       expect(() => new UserEntity(props)).toThrow(EntityValidationError);
     });
-    
+
+    it('Should throw an error when creating a user with invalid password', () => {
+      let props: UserProps = {
+        ...UserDataBuilder({}),
+        password: null as unknown as string,
+      };
+
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+
+      props = {
+        ...UserDataBuilder({}),
+        password: '' as unknown as string,
+      };
+
+      props = {
+        ...UserDataBuilder({}),
+        password: 10 as unknown as string,
+      };
+
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+
+      props = {
+        ...UserDataBuilder({}),
+        password: 'a'.repeat(101) as unknown as string,
+      };
+      expect(() => new UserEntity(props)).toThrow(EntityValidationError);
+    });
   });
 });
