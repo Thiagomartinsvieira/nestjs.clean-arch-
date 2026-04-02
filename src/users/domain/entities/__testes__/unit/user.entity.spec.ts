@@ -4,11 +4,20 @@ import { UserDataBuilder } from '@/users/domain/testing/helpers/user-data-builde
 describe('UserEntity unit tests', () => {
   let props: UserProps;
   let sut: UserEntity;
+  let validateSpy: jest.SpyInstance<void, [UserProps]>;
+
   beforeEach(() => {
+    validateSpy = jest.spyOn(UserEntity, 'validate').mockImplementation();
     props = UserDataBuilder({});
     sut = new UserEntity(props);
   });
+
+  afterEach(() => {
+    validateSpy.mockRestore();
+  });
+
   it('Constructor method', () => {
+    expect(validateSpy).toHaveBeenCalled();
     expect(sut.props.name).toEqual(props.name);
     expect(sut.props.email).toEqual(props.email);
     expect(sut.props.password).toEqual(props.password);
@@ -52,11 +61,14 @@ describe('UserEntity unit tests', () => {
   });
 
   it('Should update a user', () => {
+    expect(validateSpy).toHaveBeenCalled();
+
     sut.updateName('new name');
     expect(sut.props.name).toEqual('new name');
   });
 
   it('Should update the passwordField', () => {
+    expect(validateSpy).toHaveBeenCalled();
     sut.updatePassword('new password');
     expect(sut.props.password).toEqual('new password');
   });

@@ -52,7 +52,7 @@ export class UserEntity extends Entity<UserProps> {
     return this.props.createdAt;
   }
 
-  static validate(props: UserProps) {
+  static validate(this: void, props: UserProps): void {
     const validator = UserValidatorFactory.create();
     validator.validate(props);
   }
