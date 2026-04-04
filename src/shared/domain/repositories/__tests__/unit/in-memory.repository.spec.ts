@@ -1,6 +1,7 @@
 import { Entity } from '@/shared/domain/entities/entity';
 import { InMemoryRepository } from '../../in-memory-repository';
 import { NotFoundError } from '@/shared/domain/errors/not-found-errror';
+import e from 'express';
 
 type StubEntityProps = {
   name: string;
@@ -63,5 +64,18 @@ describe('InMemoryRepository unit tests', () => {
     );
     await sut.update(entityUpdated);
     expect(entityUpdated.toJSON()).toStrictEqual(sut.items[0].toJSON());
+  });
+
+  it('Should throw error when entity not found', async () => {
+    await expect(sut.delete('fakeId')).rejects.toThrow(
+      new NotFoundError('Entity not found'),
+    );
+  });
+
+  it('Should delete an entity', async () => {
+    const entity = new StubEntity({ name: 'test name', price: 50 });
+    await sut.insert(entity);
+    await sut.delete(entity.id);
+    expect(sut.items.length).toBe(0);
   });
 });
