@@ -36,7 +36,7 @@ export abstract class InMemoryRepository<
     const _id = `${id}`;
     const entity = this.items.find(item => item.id === _id);
     if (!entity) {
-      throw new NotFoundError('Entity not found.');
+      throw new NotFoundError('Entity not found');
     }
 
     return Promise.resolve(entity);
