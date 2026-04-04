@@ -15,8 +15,6 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "types": ["node", "jest"],
-    "ignoreDeprecations": "5.0",
-    "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     },
