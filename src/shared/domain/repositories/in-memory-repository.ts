@@ -7,16 +7,17 @@ export abstract class InMemoryRepository<
 > implements RepositoryInterface<E> {
   items: E[] = [];
 
-  async insert(entity: E): Promise<void> {
+  insert(entity: E): Promise<void> {
     this.items.push(entity);
+    return Promise.resolve();
   }
 
   async findById(id: string): Promise<E> {
     return this._get(id);
   }
 
-  async findAll(): Promise<E[]> {
-    return this.items;
+  findAll(): Promise<E[]> {
+    return Promise.resolve(this.items);
   }
 
   async update(entity: E): Promise<void> {
@@ -31,13 +32,13 @@ export abstract class InMemoryRepository<
     this.items.splice(index, 1);
   }
 
-  protected async _get(id: string): Promise<E> {
+  protected _get(id: string): Promise<E> {
     const _id = `${id}`;
     const entity = this.items.find(item => item.id === _id);
     if (!entity) {
       throw new NotFoundError('Entity not found.');
     }
 
-    return entity;
+    return Promise.resolve(entity);
   }
 }
