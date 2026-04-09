@@ -1,4 +1,3 @@
-import { th } from '@faker-js/faker';
 import { Entity } from '../entities/entity';
 import { RepositoryInterface } from './repository-contracts';
 
@@ -13,27 +12,27 @@ export type SearchProps<Filter = string> = {
 };
 
 export class SearchParams {
-  protected _page: number;
+  protected _page = 1;
   protected _perPage = 15;
-  protected _sort: string | null;
-  protected _sortDir: SortDirection | null;
-  protected _filter: string | null;
+  protected _sort: string | null = null;
+  protected _sortDir: SortDirection | null = null;
+  protected _filter: string | null = null;
 
-  constructor(props: SearchProps) {
-    this._page = props.page || 1;
-    this._perPage = props.perPage || 15;
-    this._sort = props.sort || null;
-    this._sortDir = props.sortDir || null;
-    this._filter = props.filter || null;
+  constructor(props: SearchProps = {}) {
+    this.page = props.page;
+    this.perPage = props.perPage;
+    this.sort = props.sort;
+    this.sortDir = props.sortDir;
+    this.filter = props.filter;
   }
 
   get page() {
     return this._page;
   }
 
-  private set page(value: number) {
-    let _page = +value;
-    if (Number.isNaN(_page) || _page <= 0 || parseInt(_page as any) !== _page) {
+  private set page(value: number | null | undefined) {
+    let _page = Number(value);
+    if (Number.isNaN(_page) || _page <= 0 || !Number.isInteger(_page)) {
       _page = 1;
     }
     this._page = _page;
@@ -43,38 +42,38 @@ export class SearchParams {
     return this._perPage;
   }
 
-  private set perPage(value: number) {
-    let _perPage = +value;
+  private set perPage(value: number | null | undefined) {
+    let _perPage =
+      value === (true as any) || value === undefined || value === null
+        ? this._perPage
+        : +value;
+
     if (
       Number.isNaN(_perPage) ||
       _perPage <= 0 ||
       parseInt(_perPage as any) !== _perPage
     ) {
-      _perPage = 1;
+      _perPage = this._perPage;
     }
-    this.page = _perPage;
+
+    this._perPage = _perPage;
   }
 
-  get sort() {
-    return this._sort;
-  }
-
-  private set sort(value: string | null) {
+  private set sort(value: string | null | undefined) {
     this._sort =
-      value === null || value == undefined || value === '' ? null : `${value}`;
+      value === null || value === undefined || value === '' ? null : `${value}`;
   }
 
   get sortDir() {
     return this._sortDir;
   }
 
-  private set sortDir(value: SortDirection | null) {
+  private set sortDir(value: SortDirection | null | undefined) {
     if (!this.sort) {
       this._sortDir = null;
       return;
     }
-
-    const dir = `${value}`.toLocaleLowerCase();
+    const dir = `${value}`.toLowerCase();
     this._sortDir = dir !== 'asc' && dir !== 'desc' ? 'desc' : dir;
   }
 
@@ -82,16 +81,16 @@ export class SearchParams {
     return this._filter;
   }
 
-  private set filter(value: string | null) {
+  private set filter(value: string | null | undefined) {
     this._filter =
-      value === null || value == undefined || value === '' ? null : `${value}`;
+      value === null || value === undefined || value === '' ? null : `${value}`;
   }
 }
 
-export interface SearchbleRepositoryInterface<
+export interface SearchableRepositoryInterface<
   E extends Entity,
   SearchInput,
   SearchOutput,
 > extends RepositoryInterface<E> {
-  search(id: SearchParams): Promise<SearchOutput>;
+  search(props: SearchParams): Promise<SearchOutput>;
 }
