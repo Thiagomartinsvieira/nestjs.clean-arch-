@@ -19,19 +19,19 @@ export class SearchParams {
   protected _filter: string | null = null;
 
   constructor(props: SearchProps = {}) {
-    this.page = props.page;
-    this.perPage = props.perPage;
-    this.sort = props.sort;
-    this.sortDir = props.sortDir;
-    this.filter = props.filter;
+    this.page = props.page ?? 1;
+    this.perPage = props.perPage ?? this._perPage;
+    this.sort = props.sort ?? null;
+    this.sortDir = props.sortDir ?? null;
+    this.filter = props.filter ?? null;
   }
 
   get page() {
     return this._page;
   }
 
-  private set page(value: number | null | undefined) {
-    let _page = Number(value);
+  private set page(value: number) {
+    let _page = +value;
     if (Number.isNaN(_page) || _page <= 0 || !Number.isInteger(_page)) {
       _page = 1;
     }
@@ -42,24 +42,23 @@ export class SearchParams {
     return this._perPage;
   }
 
-  private set perPage(value: number | null | undefined) {
-    let _perPage =
-      value === (true as any) || value === undefined || value === null
-        ? this._perPage
-        : +value;
-
+  private set perPage(value: number) {
+    let _perPage = value === (true as any) ? this._perPage : +value;
     if (
       Number.isNaN(_perPage) ||
       _perPage <= 0 ||
-      parseInt(_perPage as any) !== _perPage
+      !Number.isInteger(_perPage)
     ) {
       _perPage = this._perPage;
     }
-
     this._perPage = _perPage;
   }
 
-  private set sort(value: string | null | undefined) {
+  get sort() {
+    return this._sort;
+  }
+
+  private set sort(value: string | null) {
     this._sort =
       value === null || value === undefined || value === '' ? null : `${value}`;
   }
@@ -68,7 +67,7 @@ export class SearchParams {
     return this._sortDir;
   }
 
-  private set sortDir(value: SortDirection | null | undefined) {
+  private set sortDir(value: SortDirection | null) {
     if (!this.sort) {
       this._sortDir = null;
       return;
@@ -81,7 +80,7 @@ export class SearchParams {
     return this._filter;
   }
 
-  private set filter(value: string | null | undefined) {
+  private set filter(value: string | null) {
     this._filter =
       value === null || value === undefined || value === '' ? null : `${value}`;
   }
@@ -94,3 +93,9 @@ export interface SearchableRepositoryInterface<
 > extends RepositoryInterface<E> {
   search(props: SearchParams): Promise<SearchOutput>;
 }
+
+export type SearchbleRepositoryInterface<
+  E extends Entity,
+  SearchInput,
+  SearchOutput,
+> = SearchableRepositoryInterface<E, SearchInput, SearchOutput>;
