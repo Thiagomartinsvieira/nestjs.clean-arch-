@@ -173,6 +173,7 @@ describe('Searchable Repository unit tests', () => {
         filter: null,
       });
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       sut = new SearchResult({
         items: ['test1', 'test2', 'test3', 'test4'] as any,
@@ -194,6 +195,7 @@ describe('Searchable Repository unit tests', () => {
         filter: 'test',
       });
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       sut = new SearchResult({
         items: ['test1', 'test2', 'test3', 'test4'] as any,
@@ -207,6 +209,7 @@ describe('Searchable Repository unit tests', () => {
 
       expect(sut.lastPage).toBe(2);
 
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
       sut = new SearchResult({
         items: ['test1', 'test2', 'test3', 'test4'] as any,
