@@ -1,4 +1,7 @@
-import { SearchParams } from '../../searchble-repository-contracts';
+import {
+  SearchParams,
+  SearchResult,
+} from '../../searchble-repository-contracts';
 
 describe('Searchable Repository unit tests', () => {
   describe('SearchParams tests', () => {
@@ -145,6 +148,77 @@ describe('Searchable Repository unit tests', () => {
             .filter,
         ).toBe(i.expected);
       });
+    });
+  });
+
+  describe('SearchResult tests', () => {
+    it('constructor props', () => {
+      let sut = new SearchResult({
+        items: ['test1', 'test2', 'test3', 'test4'] as any,
+        total: 4,
+        currentPage: 1,
+        perPage: 2,
+        sort: null,
+        sortDir: null,
+        filter: null,
+      });
+      expect(sut.toJson()).toStrictEqual({
+        items: ['test1', 'test2', 'test3', 'test4'],
+        total: 4,
+        currentPage: 1,
+        lastPage: 2,
+        perPage: 2,
+        sort: null,
+        sortDir: null,
+        filter: null,
+      });
+
+      // @ts-expect-error
+      sut = new SearchResult({
+        items: ['test1', 'test2', 'test3', 'test4'] as any,
+        total: 4,
+        currentPage: 1,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test',
+      });
+      expect(sut.toJson()).toStrictEqual({
+        items: ['test1', 'test2', 'test3', 'test4'],
+        total: 4,
+        currentPage: 1,
+        lastPage: 2,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test',
+      });
+
+      // @ts-expect-error
+      sut = new SearchResult({
+        items: ['test1', 'test2', 'test3', 'test4'] as any,
+        total: 4,
+        currentPage: 1,
+        perPage: 2,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test',
+      });
+
+      expect(sut.lastPage).toBe(2);
+
+      // @ts-expect-error
+      sut = new SearchResult({
+        items: ['test1', 'test2', 'test3', 'test4'] as any,
+        total: 54,
+        currentPage: 1,
+        perPage: 10,
+        sort: 'name',
+        sortDir: 'asc',
+        filter: 'test',
+      });
+
+      expect(sut.lastPage).toBe(6);
     });
   });
 });
