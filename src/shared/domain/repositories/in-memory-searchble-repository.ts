@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Entity } from '../entities/entity';
 import { InMemoryRepository } from './in-memory-repository';
 import {
@@ -6,11 +7,13 @@ import {
   SearchResult,
 } from './searchble-repository-contracts';
 
-export abstract class InMemorySearchbleRepository<E extends Entity>
+export abstract class InMemorySearchableRepository<E extends Entity>
   extends InMemoryRepository<E>
   implements SearchableRepositoryInterface<E, any, any>
 {
-  async search(props: SearchParams): Promise<SearchResult<E, any>> {
+  sortableFields: string[] = [];
+
+  async search(props: SearchParams): Promise<SearchResult<E>> {
     const itemsFiltered = await this.applyFilter(this.items, props.filter);
     const itemsSorted = await this.applySort(
       itemsFiltered,
@@ -22,7 +25,6 @@ export abstract class InMemorySearchbleRepository<E extends Entity>
       props.page,
       props.perPage,
     );
-
     return new SearchResult({
       items: itemsPaginated,
       total: itemsFiltered.length,
@@ -42,8 +44,23 @@ export abstract class InMemorySearchbleRepository<E extends Entity>
   protected async applySort(
     items: E[],
     sort: string | null,
-    sorDir: string | null,
-  ): Promise<E[]> {}
+    sortDir: string | null,
+  ): Promise<E[]> {
+    if (!sort || !this.sortableFields.includes(sort)) {
+      return items;
+    }
+    return [...items].sort((a, b) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (a.props[sort] < b.props[sort]) {
+        return sortDir === 'asc' ? -1 : 1;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (a.props[sort] > b.props[sort]) {
+        return sortDir === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  }
 
   protected async applyPaginate(
     items: E[],
