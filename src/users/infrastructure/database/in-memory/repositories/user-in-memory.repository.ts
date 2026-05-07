@@ -1,27 +1,52 @@
-import { ConflictError } from '@/shared/domain/errors/conflict-error';
-import { NotFoundError } from '@/shared/domain/errors/not-found-errror';
-import { InMemorySearchbleRepository } from '@/shared/domain/repositories/in-memory-searchble-repository';
-import { UserEntity } from '@/users/domain/entities/user.entity';
+/* eslint-disable @typescript-eslint/require-await */
 import { UserRepository } from '@/users/domain/repositories/user.repository';
+import { UserEntity } from '@/users/domain/entities/user.entity';
+import { ConflictError } from '@/shared/domain/errors/conflict-error';
+import { InMemorySearchableRepository } from '@/shared/domain/repositories/in-memory-searchble-repository';
+import { SortDirection } from '@/shared/domain/repositories/searchble-repository-contracts';
+import { NotFoundError } from '@/shared/domain/errors/not-found-errror';
 
 export class UserInMemoryRepository
-  extends InMemorySearchbleRepository<UserEntity>
-  implements UserRepository
+  extends InMemorySearchableRepository<UserEntity>
+  implements UserRepository.Repository
 {
+  sortableFields: string[] = ['name', 'createdAt'];
+
+  // eslint-disable-next-line @typescript-eslint/require-await
   async findByEmail(email: string): Promise<UserEntity> {
     const entity = this.items.find(item => item.email === email);
     if (!entity) {
-      throw new NotFoundError(`Entity not found using ${email}`);
+      throw new NotFoundError(`Entity not found using email ${email}`);
     }
-
-    return Promise.resolve(entity);
+    return entity;
   }
 
   async emailExists(email: string): Promise<void> {
     const entity = this.items.find(item => item.email === email);
     if (entity) {
-      throw new ConflictError(`Email adrress already used ${email}`);
+      throw new ConflictError('Email address already used');
     }
-    return Promise.resolve();
+  }
+
+  protected async applyFilter(
+    items: UserEntity[],
+    filter: UserRepository.Filter,
+  ): Promise<UserEntity[]> {
+    if (!filter) {
+      return items;
+    }
+    return items.filter(item => {
+      return item.props.name.toLowerCase().includes(filter.toLowerCase());
+    });
+  }
+
+  protected async applySort(
+    items: UserEntity[],
+    sort: string | null,
+    sortDir: SortDirection | null,
+  ): Promise<UserEntity[]> {
+    return !sort
+      ? super.applySort(items, 'createdAt', 'desc')
+      : super.applySort(items, sort, sortDir);
   }
 }
