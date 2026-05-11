@@ -14,6 +14,8 @@ export namespace SignupUseCase {
   };
 
   export class useCase {
-    async execute({ input: Input }): Promise<Output> {}
+    async execute({ input: Input }): Promise<Output> {
+      
+    }
   }
 }
