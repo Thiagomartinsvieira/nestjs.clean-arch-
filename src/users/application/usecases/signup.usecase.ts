@@ -18,7 +18,7 @@ export namespace SignupUseCase {
     createdAt: Date;
   };
 
-  export class useCase {
+  export class UseCase {
     constructor(
       private userRepository: UserRepository.Repository,
       private hashProvider: HashProvider,
