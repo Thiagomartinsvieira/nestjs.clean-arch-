@@ -1,5 +1,5 @@
 import { UserRepository } from '@/users/domain/repositories/user.repository';
-import { BadRequestError } from '../errors/bad-request-errror';
+import { BadRequestError } from '../../../shared/application/errors/bad-request-errror';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { UserOutPut } from '../dtos/user-output';
@@ -14,13 +14,13 @@ export namespace SignupUseCase {
 
   export type Output = UserOutPut;
 
-  export class UseCase implements DefaultUseCase<Input, Output> {
+  export class UseCase implements DefaultUseCase<{ input: Input }, Output> {
     constructor(
       private userRepository: UserRepository.Repository,
       private hashProvider: HashProvider,
     ) {}
 
-    async execute(input: Input): Promise<Output> {
+    async execute({ input }: { input: Input }): Promise<Output> {
       const { name, email, password } = input;
 
       if (!name || !email || !password) {
