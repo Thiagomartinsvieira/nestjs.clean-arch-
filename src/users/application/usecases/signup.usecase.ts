@@ -3,6 +3,7 @@ import { BadRequestError } from '../errors/bad-request-errror';
 import { UserEntity } from '@/users/domain/entities/user.entity';
 import { HashProvider } from '@/shared/application/providers/hash-provider';
 import { UserOutPut } from '../dtos/user-output';
+import { UseCase as DefaultUseCase } from '@/shared/application/useCases/use-case';
 
 export namespace SignupUseCase {
   export type Input = {
@@ -13,14 +14,14 @@ export namespace SignupUseCase {
 
   export type Output = UserOutPut;
 
-  export class UseCase {
+  export class UseCase implements DefaultUseCase<Input, Output> {
     constructor(
       private userRepository: UserRepository.Repository,
       private hashProvider: HashProvider,
     ) {}
 
-    async execute({ input: Input }): Promise<Output> {
-      const { name, email, password } = Input;
+    async execute(input: Input): Promise<Output> {
+      const { name, email, password } = input;
 
       if (!name || !email || !password) {
         throw new BadRequestError('Name, email and password are required');
@@ -31,7 +32,7 @@ export namespace SignupUseCase {
       const hashPassword = await this.hashProvider.generateHash(password);
 
       const entity = new UserEntity(
-        Object.assign(Input, { password: hashPassword }),
+        Object.assign(input, { password: hashPassword }),
       );
 
       await this.userRepository.insert(entity);

@@ -1,5 +1,6 @@
 import { UserRepository } from '@/users/domain/repositories/user.repository';
 import { UserOutPut } from '../dtos/user-output';
+import { UseCase as DefaultUseCase } from '@/shared/application/useCases/use-case';
 
 export namespace GetUserUseCase {
   export type Input = {
@@ -8,7 +9,7 @@ export namespace GetUserUseCase {
 
   export type Output = UserOutPut;
 
-  export class UseCase {
+  export class UseCase implements DefaultUseCase<Input, Output> {
     constructor(private userRepository: UserRepository.Repository) {}
 
     async execute(input: Input): Promise<Output> {
