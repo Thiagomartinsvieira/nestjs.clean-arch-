@@ -1,12 +1,16 @@
 import { UserRepository } from '@/users/domain/repositories/user.repository';
-import { UserOutPut } from '../dtos/user-output';
+import { UserOutPut, UserOutPutMapper } from '../dtos/user-output';
 import { UseCase as DefaultUseCase } from '@/shared/application/useCases/use-case';
 import { SearchInput } from '@/shared/application/dtos/search-input';
+import {
+  PaginationOutput,
+  PaginationOutputMapper,
+} from '@/shared/application/dtos/pagination-output';
 
 export namespace ListUsersUseCase {
   export type Input = SearchInput;
 
-  export type Output = void;
+  export type Output = PaginationOutput<UserOutPut>;
 
   export class UseCase implements DefaultUseCase<Input, Output> {
     constructor(private userRepository: UserRepository.Repository) {}
@@ -14,7 +18,14 @@ export namespace ListUsersUseCase {
     async execute(input: Input): Promise<Output> {
       const params = new UserRepository.SearchParams(input);
       const searchResult = await this.userRepository.search(params);
-      return;
+      return this.toOutput(searchResult);
+    }
+
+    private toOutput(searchResult: UserRepository.SearchResult): Output {
+      const items = searchResult.items.map(entity =>
+        UserOutPutMapper.toOutput(entity),
+      );
+      return PaginationOutputMapper.toOutput(items, searchResult);
     }
   }
 }
