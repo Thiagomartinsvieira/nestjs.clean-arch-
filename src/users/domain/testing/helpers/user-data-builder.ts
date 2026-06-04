@@ -3,8 +3,8 @@ import { UserProps } from '../../entities/user.entity';
 
 type Props = {
   name?: string;
-  email?: string;
-  password?: string;
+  email?: string | null;
+  password?: string | null;
   createdAt?: Date;
 };
 
