@@ -6,37 +6,84 @@ import {
   Patch,
   Param,
   Delete,
+  Inject,
+  HttpCode,
+  Query,
+  Put,
 } from '@nestjs/common';
 import { SignupDto } from './dtos/signup.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { UsersService } from './users.service';
+import { SignupUseCase } from '../application/usecases/signup.usecase';
+import { UpdateUserUseCase } from '../application/usecases/update-user.usecase';
+import { UpdatePasswordUseCase } from '../application/usecases/update-password.usecase';
+import { DeleteUserUseCase } from '../application/usecases/delete-user.usecase';
+import { ListUsersUseCase } from '../application/usecases/listusers.usecase';
+import { UpdatePasswordDto } from './dtos/update-password.dto';
+import { listUsersDto } from './dtos/list-users.dto';
+import { SigninDto } from './dtos/signinp.dto';
+import { SignInUseCase } from '../application/usecases/signIn.usecase';
+import { GetUserUseCase } from '../application/usecases/get-user.usecase';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  @Inject(SignupUseCase.UseCase)
+  private signupUseCase!: SignupUseCase.UseCase;
+
+  @Inject(SignInUseCase.UseCase)
+  private signinUseCase!: SignInUseCase.UseCase;
+
+  @Inject(UpdateUserUseCase.UseCase)
+  private updateUserUseCase!: UpdateUserUseCase.UseCase;
+
+  @Inject(UpdatePasswordUseCase.UseCase)
+  private updatePasswordUseCase!: UpdatePasswordUseCase.UseCase;
+
+  @Inject(DeleteUserUseCase.UseCase)
+  private deleteUserUseCase!: DeleteUserUseCase.UseCase;
+
+  @Inject(GetUserUseCase.UseCase)
+  private getUserUseCase!: GetUserUseCase.UseCase;
+
+  @Inject(ListUsersUseCase.UseCase)
+  private listUsersUseCase!: ListUsersUseCase.UseCase;
 
   @Post()
-  create(@Body() signupDto: SignupDto) {
-    return this.usersService.create(SignupDto);
+  async create(@Body() signupDto: SignupDto) {
+    return this.signupUseCase.execute({ input: signupDto });
+  }
+
+  @HttpCode(200)
+  @Post('login')
+  async login(@Body() signinDto: SigninDto) {
+    return this.signinUseCase.execute({ input: signinDto });
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async search(@Query() searchParams: listUsersDto) {
+    return this.listUsersUseCase.execute(searchParams);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return this.getUserUseCase.execute({ id });
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.updateUserUseCase.execute({ id, ...updateUserDto });
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async updatePassword(
+    @Param('id') id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    return this.updatePasswordUseCase.execute({ id, ...updatePasswordDto });
   }
 
+  @HttpCode(204)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.deleteUserUseCase.execute({ id });
   }
 }
