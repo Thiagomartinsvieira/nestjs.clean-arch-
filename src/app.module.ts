@@ -3,9 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EnvConfigModule } from './shared/infraestructure/env-config/env-config.module';
 import { UsersModule } from './users/infrastructure/users.module';
+import { DatabaseModule } from './shared/infraestrucutre/database/database.module';
 
 @Module({
-  imports: [EnvConfigModule.forRoot(), UsersModule],
+  imports: [EnvConfigModule.forRoot(), UsersModule, DatabaseModule],
   controllers: [AppController],
   providers: [AppService],
 })
